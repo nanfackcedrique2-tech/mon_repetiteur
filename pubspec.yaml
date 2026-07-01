@@ -1,0 +1,36 @@
+name: mon_repetiteur
+description: "Application éducative pour les élèves du primaire au Cameroun."
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Stockage local
+  sqflite: ^2.3.0
+  path_provider: ^2.1.0
+  path: ^1.9.0          # <--- AJOUTÉ pour résoudre l'erreur d'import
+
+  # Gestion d'état
+  provider: ^6.1.0
+
+  # Synthèse vocale hors ligne
+  kitten_tts_flutter: ^0.0.1
+
+  # Gestion des dates
+  intl: ^0.20.2
+
+  # Support des locales françaises
+  flutter_localizations:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true

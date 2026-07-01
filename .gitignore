@@ -1,0 +1,25 @@
+# Fichiers générés par Flutter / Dart
+.dart_tool/
+.packages
+pubspec.lock
+build/
+flutter_*.png
+
+# Dossiers Android et iOS (reconstruits automatiquement)
+android/.gradle
+android/.idea
+android/local.properties
+ios/.symlinks
+ios/Pods
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+*.log
+*.iml
+.vscode/
+.idea/
+
+# Fichiers de clés (sécurité)
+*.jks
+key.properties
