@@ -45,8 +45,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               'Pour accéder aux leçons, choisis une formule ci-dessous.',
               style: TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 24),
-            Expanded(
+            const SizedBox(height: 16),
+            // ICI : On remplace Expanded par Flexible pour mieux gérer l'espace
+            Flexible(
               child: ListView.builder(
                 itemCount: _plans.keys.length,
                 itemBuilder: (context, index) {
@@ -57,7 +58,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   return Card(
                     margin: const EdgeInsets.symmetric(vertical: 6),
                     child: ListTile(
-                      title: Text(label), // <--- CORRECTION : suppression de l'interpolation
+                      title: Text(label),
                       subtitle: Text('Durée : $days jour(s)'),
                       trailing: Text(
                         '${price == 0 ? "Gratuit" : "$price FCFA"}',
@@ -93,7 +94,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   ? const CircularProgressIndicator(color: Colors.white)
                   : const Text('ACTIVER L\'ABONNEMENT'),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             TextButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
