@@ -31,7 +31,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,42 +46,36 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 16),
-            // ICI : On remplace Expanded par Flexible pour mieux gérer l'espace
-            Flexible(
-              child: ListView.builder(
-                itemCount: _plans.keys.length,
-                itemBuilder: (context, index) {
-                  String label = _plans.keys.elementAt(index);
-                  var data = _plans[label];
-                  double price = data['price'];
-                  int days = data['duration'];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    child: ListTile(
-                      title: Text(label),
-                      subtitle: Text('Durée : $days jour(s)'),
-                      trailing: Text(
-                        '${price == 0 ? "Gratuit" : "$price FCFA"}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: price == 0 ? Colors.green : Colors.blue,
-                        ),
-                      ),
-                      onTap: () => _selectPlan(label),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(
-                          color: _selectedType == label
-                              ? Colors.blue
-                              : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
+            // On génère les cartes manuellement dans une Column
+            ..._plans.keys.map((label) {
+              var data = _plans[label];
+              double price = data['price'];
+              int days = data['duration'];
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                child: ListTile(
+                  title: Text(label),
+                  subtitle: Text('Durée : $days jour(s)'),
+                  trailing: Text(
+                    '${price == 0 ? "Gratuit" : "$price FCFA"}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: price == 0 ? Colors.green : Colors.blue,
                     ),
-                  );
-                },
-              ),
-            ),
+                  ),
+                  onTap: () => _selectPlan(label),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(
+                      color: _selectedType == label
+                          ? Colors.blue
+                          : Colors.transparent,
+                      width: 2,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _isLoading ? null : _activateSubscription,
