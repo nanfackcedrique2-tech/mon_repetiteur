@@ -36,44 +36,48 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Bienvenue !',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
+            const Text('Bienvenue !', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             const Text('Sélectionne une formule :'),
             const SizedBox(height: 16),
+            // On ajoute un texte de débogage pour voir le nombre d'éléments
+            Text('Nombre de formules : ${_plans.length}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            const SizedBox(height: 8),
+            // Utilisation de Expanded avec un Container coloré pour visualiser l'espace
             Expanded(
-              child: ListView.builder(
-                itemCount: _plans.keys.length,
-                itemBuilder: (context, index) {
-                  String label = _plans.keys.elementAt(index);
-                  var data = _plans[label];
-                  double price = data['price'];
-                  int days = data['duration'];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    child: ListTile(
-                      title: Text(label),
-                      subtitle: Text('$days jour(s)'),
-                      trailing: Text(
-                        price == 0 ? 'Gratuit' : '$price FCFA',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: price == 0 ? Colors.green : Colors.blue,
+              child: Container(
+                color: Colors.grey[100], // Pour voir où se trouve la liste
+                child: ListView.builder(
+                  itemCount: _plans.keys.length,
+                  itemBuilder: (context, index) {
+                    String label = _plans.keys.elementAt(index);
+                    var data = _plans[label];
+                    double price = data['price'];
+                    int days = data['duration'];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      child: ListTile(
+                        title: Text(label),
+                        subtitle: Text('$days jour(s)'),
+                        trailing: Text(
+                          price == 0 ? 'Gratuit' : '$price FCFA',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: price == 0 ? Colors.green : Colors.blue,
+                          ),
+                        ),
+                        onTap: () => _selectPlan(label),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: _selectedType == label ? Colors.blue : Colors.transparent,
+                            width: 2,
+                          ),
                         ),
                       ),
-                      onTap: () => _selectPlan(label),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(
-                          color: _selectedType == label ? Colors.blue : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 16),
