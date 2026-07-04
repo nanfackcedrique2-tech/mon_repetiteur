@@ -18,19 +18,15 @@ class DatabaseHelper {
 
   static Database? _database;
 
-  // Getter qui initialise la base s'il le faut
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
   }
 
-  // Initialisation
   Future<Database> _initDatabase() async {
-    // Récupère le répertoire de documents (hors ligne)
     Directory dir = await getApplicationDocumentsDirectory();
     String dbPath = path.join(dir.path, 'mon_repetiteur.db');
-
     return await openDatabase(
       dbPath,
       version: 1,
@@ -38,9 +34,7 @@ class DatabaseHelper {
     );
   }
 
-  // Création des tables
   Future<void> _onCreate(Database db, int version) async {
-    // Table des leçons
     await db.execute('''
       CREATE TABLE lessons (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,7 +47,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Table des exercices
     await db.execute('''
       CREATE TABLE exercises (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,7 +59,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Table des élèves
     await db.execute('''
       CREATE TABLE students (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,7 +71,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Table des progressions
     await db.execute('''
       CREATE TABLE progress (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -93,7 +84,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Table des rapports parents
     await db.execute('''
       CREATE TABLE parent_reports (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -107,7 +97,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Table des abonnements
     await db.execute('''
       CREATE TABLE subscriptions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -120,7 +109,7 @@ class DatabaseHelper {
     ''');
   }
 
-  // ========== MÉTHODES GENERIQUES ==========
+  // ========== MÉTHODES GÉNÉRIQUES ==========
 
   Future<int> insert(String table, Map<String, dynamic> data) async {
     Database db = await database;
@@ -292,7 +281,6 @@ class DatabaseHelper {
   }
 
   Future<int> deactivateAllSubscriptions() async {
-    // Met toutes les subscriptions à inactives
     return await update(
       'subscriptions',
       {'isActive': 0},

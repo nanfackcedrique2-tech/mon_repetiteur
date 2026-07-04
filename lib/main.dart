@@ -16,10 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Mon Répétiteur',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
@@ -31,7 +28,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Écran de démarrage qui vérifie l'abonnement
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -40,35 +36,56 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  String? _errorMessage;
+
   @override
   void initState() {
     super.initState();
     _checkSubscription();
   }
 
-  // MÉTHODE CORRIGÉE avec vérification 'mounted'
   Future<void> _checkSubscription() async {
-    final db = DatabaseHelper();
+    try {
+      final db = DatabaseHelper();
+      await db.database; // initialise la base
 
-    await db.database;
+      final seeder = DataSeeder();
+      await seeder.seedAll();
 
-    final seeder = DataSeeder();
-    await seeder.seedAll();
+      Subscription? activeSub = await db.getActiveSubscription();
 
-    Subscription? activeSub = await db.getActiveSubscription();
-
-    // Vérifier si le widget est toujours monté avant de naviguer
-    if (!mounted) return;
-
-    if (activeSub != null) {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      Navigator.pushReplacementNamed(context, '/subscription');
+      if (!mounted) return;
+      if (activeSub != null) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        Navigator.pushReplacementNamed(context, '/subscription');
+      }
+    } catch (e, stack) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Erreur : $e\n\n$stack';
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_errorMessage != null) {
+      return Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Text(
+                _errorMessage!,
+                style: const TextStyle(color: Colors.red, fontSize: 14),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     return const Scaffold(
       body: Center(
         child: Column(
@@ -76,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 16),
-            Text('Chargement de Mon Répétiteur...'),
+            Text('Chargement...'),
           ],
         ),
       ),
@@ -84,7 +101,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-// Page d'accueil (liste des leçons)
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -116,10 +132,8 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              _deactivateSubscription();
-            },
-            tooltip: 'Déconnexion (test)',
+            onPressed: _deactivateSubscription,
+            tooltip: 'Déconnexion',
           ),
         ],
       ),
@@ -127,33 +141,14 @@ class _HomePageState extends State<HomePage> {
         future: _lessonsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Chargement des leçons...'),
-                ],
-              ),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
-
           if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Erreur : ${snapshot.error}',
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
+            return Center(child: Text('Erreur : ${snapshot.error}', style: const TextStyle(color: Colors.red)));
           }
-
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('Aucune leçon trouvée pour la classe SIL.'),
-            );
+            return const Center(child: Text('Aucune leçon trouvée.'));
           }
-
           final lessons = snapshot.data!;
           return ListView.builder(
             itemCount: lessons.length,
@@ -163,7 +158,7 @@ class _HomePageState extends State<HomePage> {
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   title: Text(lesson.title),
-                  subtitle: Text('Matière : ${lesson.subject} | Niveau : ${lesson.classLevel}'),
+                  subtitle: Text('${lesson.subject} - ${lesson.classLevel}'),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -179,15 +174,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // MÉTHODE CORRIGÉE avec vérification 'mounted'
   Future<void> _deactivateSubscription() async {
     final db = DatabaseHelper();
     await db.deactivateAllSubscriptions();
-
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Abonnement désactivé (test). Retour à l\'écran de choix.'),
+        content: Text('Abonnement désactivé. Retour au choix.'),
         backgroundColor: Colors.orange,
       ),
     );
