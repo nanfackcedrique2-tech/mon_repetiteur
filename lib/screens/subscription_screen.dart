@@ -31,70 +31,58 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Bienvenue !', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const Text('Sélectionne une formule :'),
-            const SizedBox(height: 8),
-            Text('Nombre de formules : ${_plans.length}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
-            const SizedBox(height: 8),
-            // On remplace Expanded par un Container avec une hauteur fixe
-            Container(
-              height: 400,  // hauteur fixe suffisante pour afficher les 7 cartes
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
+        children: [
+          const Text('Bienvenue !', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          const Text('Sélectionne une formule :'),
+          const SizedBox(height: 16),
+          // On ajoute un indicateur de nombre (pour débogage)
+          Text('Nombre de formules : ${_plans.length}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          const SizedBox(height: 8),
+          // Les cartes des formules
+          ..._plans.keys.map((label) {
+            var data = _plans[label];
+            double price = data['price'];
+            int days = data['duration'];
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 6),
+              child: ListTile(
+                title: Text(label),
+                subtitle: Text('$days jour(s)'),
+                trailing: Text(
+                  price == 0 ? 'Gratuit' : '$price FCFA',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: price == 0 ? Colors.green : Colors.blue,
+                  ),
+                ),
+                onTap: () => _selectPlan(label),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(
+                    color: _selectedType == label ? Colors.blue : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
               ),
-              child: ListView.builder(
-                itemCount: _plans.keys.length,
-                itemBuilder: (context, index) {
-                  String label = _plans.keys.elementAt(index);
-                  var data = _plans[label];
-                  double price = data['price'];
-                  int days = data['duration'];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                    child: ListTile(
-                      title: Text(label),
-                      subtitle: Text('$days jour(s)'),
-                      trailing: Text(
-                        price == 0 ? 'Gratuit' : '$price FCFA',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: price == 0 ? Colors.green : Colors.blue,
-                        ),
-                      ),
-                      onTap: () => _selectPlan(label),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(
-                          color: _selectedType == label ? Colors.blue : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+            );
+          }).toList(),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _isLoading ? null : _activateSubscription,
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 50),
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
             ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _activateSubscription,
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-              ),
-              child: _isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('ACTIVER'),
-            ),
-          ],
-        ),
+            child: _isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text('ACTIVER'),
+          ),
+          const SizedBox(height: 20), // espace en bas pour le confort de défilement
+        ],
       ),
     );
   }
